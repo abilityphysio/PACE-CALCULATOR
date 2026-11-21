@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Pace Lane — Running Calculator</title>
+
+  <!-- PWA & Mobile App Meta Tags -->
+  <meta name="theme-color" content="#EA580C" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Pace Lane" />
+  <meta name="description" content="Offline-ready track & road running pace, distance (80m–5000m), and duration calculator." />
+
+  <!-- Inline SVG App Icon (Favicon & Apple Touch Icon) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%23EA580C'/%3E%3Ccircle cx='256' cy='272' r='148' fill='none' stroke='%23FFFFFF' stroke-width='28'/%3E%3Cpath d='M256 84v40M216 84h80M362 154l26-26' stroke='%23FFFFFF' stroke-width='26' stroke-linecap='round'/%3E%3Cpath d='M256 272V184M256 272l62 44' stroke='%23FFFFFF' stroke-width='28' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='256' cy='272' r='18' fill='%23FFFFFF'/%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%23EA580C'/%3E%3Ccircle cx='256' cy='272' r='148' fill='none' stroke='%23FFFFFF' stroke-width='28'/%3E%3Cpath d='M256 84v40M216 84h80M362 154l26-26' stroke='%23FFFFFF' stroke-width='26' stroke-linecap='round'/%3E%3Cpath d='M256 272V184M256 272l62 44' stroke='%23FFFFFF' stroke-width='28' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='256' cy='272' r='18' fill='%23FFFFFF'/%3E%3C/svg%3E" />
+
+  <!-- Embedded Data-URI Web App Manifest for Android Chrome Installability -->
+  <link id="pwa-manifest" rel="manifest" href='data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Pace%20Lane%20%E2%80%94%20Running%20Calculator%22%2C%22short_name%22%3A%22Pace%20Lane%22%2C%22description%22%3A%22Track%20and%20road%20running%20pace%2C%20distance%20(80m-5000m)%2C%20and%20duration%20calculator.%22%2C%22start_url%22%3A%22.%2F%22%2C%22scope%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait%22%2C%22background_color%22%3A%22%23F5F4F0%22%2C%22theme_color%22%3A%22%23EA580C%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%2520viewBox%3D%270%200%20512%20512%27%253E%253Crect%2520width%3D%27512%27%2520height%3D%27512%27%2520rx%3D%27112%27%2520fill%3D%27%2523EA580C%27%2F%253E%253Ccircle%2520cx%3D%27256%27%2520cy%3D%27272%27%2520r%3D%27148%27%2520fill%3D%27none%27%2520stroke%3D%27%2523FFFFFF%27%2520stroke-width%3D%2728%27%2F%253E%253Cpath%2520d%3D%27M256%252084v40M216%252084h80M362%2520154l26-26%27%2520stroke%3D%27%2523FFFFFF%27%2520stroke-width%3D%2726%27%2520stroke-linecap%3D%27round%27%2F%253E%253Cpath%2520d%3D%27M256%2520272V184M256%2520272l62%252044%27%2520stroke%3D%27%2523FFFFFF%27%2520stroke-width%3D%2728%27%2520stroke-linecap%3D%27round%27%2520stroke-linejoin%3D%27round%27%2F%253E%253Ccircle%2520cx%3D%27256%27%2520cy%3D%27272%27%2520r%3D%2718%27%2520fill%3D%27%2523FFFFFF%27%2F%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D' />
+
+  <!-- Tailwind CSS & Google Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            surface: {
+              bg: '#F4F3EF',
+              card: '#FAF9F6',
+              well: '#ECEAE4',
+              border: '#DFDDD6',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* Custom tactile range slider & touch-friendly refinements */
+    body {
+      background-color: #F4F3EF;
+      color: #1C1917;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: contain;
+    }
+
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"].pace-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      background: #E2DFD7;
+      border-radius: 999px;
+      outline: none;
+    }
+
+    input[type="range"].pace-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #EA580C;
+      border: 3px solid #FFFFFF;
+      box-shadow: 0 2px 6px rgba(234, 88, 12, 0.4);
+      cursor: pointer;
+      transition: transform 0.12s ease;
+    }
+
+    input[type="range"].pace-slider::-webkit-slider-thumb:active {
+      transform: scale(1.15);
+    }
+
+    input[type="range"].pace-slider::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #EA580C;
+      border: 3px solid #FFFFFF;
+      box-shadow: 0 2px 6px rgba(234, 88, 12, 0.4);
+      cursor: pointer;
+    }
+
+    /* Hide number input spinners cleanly */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+
+    /* Smooth horizontal chip scrollbar hiding */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-200 selection:text-brand-700">
+
+  <!-- Top App Header -->
+  <header class="w-full max-w-5xl mx-auto px-4 pt-5 pb-3 flex items-center justify-between gap-2">
+    <div class="flex items-center gap-2.5">
+      <span class="w-3 h-3 rounded-full bg-brand-600 shadow-sm inline-block"></span>
+      <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-stone-900">
+        PACE <span class="text-brand-600">LANE</span>
+      </h1>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <span class="hidden md:inline-block text-xs font-medium text-stone-500 mr-2">
+        Pick any two — the third is computed live.
+      </span>
+      <button
+        id="install-btn"
+        type="button"
+        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-stone-900 hover:bg-stone-800 active:scale-95 text-white text-xs font-semibold shadow-sm transition cursor-pointer"
+        aria-label="Install as Android App"
+      >
+        <svg class="w-3.5 h-3.5 text-brand-500" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 16V4m0 12l-4-4m4 4l4-4M4 20h16" />
+        </svg>
+        <span>Install App</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="w-full max-w-5xl mx-auto px-4 pb-6 flex-1 flex flex-col gap-4">
+
+    <!-- Mobile Subtitle -->
+    <p class="md:hidden text-xs font-medium text-stone-500 text-center">
+      Pick any two — tap the orange target to choose what calculates live.
+    </p>
+
+    <!-- Mode Selector Segmented Pill Bar -->
+    <section aria-label="Select computed variable" class="bg-surface-well p-1.5 rounded-full border border-surface-border shadow-inner grid grid-cols-3 gap-1">
+      <button
+        type="button"
+        data-mode="distance"
+        class="mode-pill py-2.5 px-3 rounded-full text-xs sm:text-sm font-bold tracking-wider uppercase transition-all duration-150 cursor-pointer flex items-center justify-center gap-1.5"
+      >
+        <span>Distance</span>
+        <span class="computed-badge hidden text-[10px] px-1.5 py-0.5 rounded-full bg-white/25 font-mono">AUTO</span>
+      </button>
+
+      <button
+        type="button"
+        data-mode="pace"
+        class="mode-pill py-2.5 px-3 rounded-full text-xs sm:text-sm font-bold tracking-wider uppercase transition-all duration-150 cursor-pointer flex items-center justify-center gap-1.5"
+      >
+        <span>Pace</span>
+        <span class="computed-badge hidden text-[10px] px-1.5 py-0.5 rounded-full bg-white/25 font-mono">AUTO</span>
+      </button>
+
+      <button
+        type="button"
+        data-mode="duration"
+        class="mode-pill py-2.5 px-3 rounded-full text-xs sm:text-sm font-bold tracking-wider uppercase transition-all duration-150 cursor-pointer flex items-center justify-center gap-1.5"
+      >
+        <span>Duration</span>
+        <span class="computed-badge hidden text-[10px] px-1.5 py-0.5 rounded-full bg-white/25 font-mono">AUTO</span>
+      </button>
+    </section>
+
+    <!-- Three Calculator Cards -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
+
+      <!-- CARD 1: DISTANCE (80m to 5000m) -->
+      <article
+        id="card-distance"
+        class="calc-card rounded-2xl p-4 sm:p-5 border transition-all duration-200 flex flex-col justify-between gap-4 bg-surface-card border-surface-border shadow-sm"
+      >
+        <div class="flex items-center justify-between">
+          <button
+            type="button"
+            data-mode="distance"
+            class="card-header-btn flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-stone-500 hover:text-brand-600 cursor-pointer"
+          >
+            <span>Distance (Meters)</span>
+            <span id="dot-distance" class="w-2 h-2 rounded-full bg-brand-600 hidden"></span>
+          </button>
+          <span id="tag-distance" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-stone-200/80 text-stone-600">
+            INPUT
+          </span>
+        </div>
+
+        <!-- Exact Distance Box + Stepper -->
+        <div class="flex flex-col gap-2">
+          <div class="relative flex items-center bg-surface-well border border-surface-border rounded-xl px-3 py-2.5 focus-within:border-brand-600 focus-within:ring-2 focus-within:ring-brand-500/20">
+            <button
+              type="button"
+              id="dist-minus"
+              aria-label="Decrease distance by 10 meters"
+              class="w-10 h-10 rounded-lg bg-white/80 hover:bg-white active:scale-95 border border-surface-border text-stone-700 font-bold text-lg flex items-center justify-center shadow-xs cursor-pointer"
+            >−</button>
+
+            <div class="flex-1 flex flex-col items-center">
+              <input
+                id="distance-input"
+                type="number"
+                inputmode="numeric"
+                min="80"
+                max="5000"
+                step="1"
+                value="5000"
+                aria-label="Distance in meters"
+                class="w-full text-center font-mono text-2xl sm:text-3xl font-bold bg-transparent text-stone-900 focus:outline-none tabular-nums"
+              />
+              <span class="text-[10px] font-semibold tracking-widest uppercase text-stone-500">
+                METERS (80–5000m)
+              </span>
+            </div>
+
+            <button
+              type="button"
+              id="dist-plus"
+              aria-label="Increase distance by 10 meters"
+              class="w-10 h-10 rounded-lg bg-white/80 hover:bg-white active:scale-95 border border-surface-border text-stone-700 font-bold text-lg flex items-center justify-center shadow-xs cursor-pointer"
+            >+</button>
+          </div>
+
+          <!-- Smooth Range Slider -->
+          <div class="px-1 pt-1">
+            <input
+              id="distance-slider"
+              type="range"
+              min="80"
+              max="5000"
+              step="10"
+              value="5000"
+              aria-label="Distance slider"
+              class="pace-slider"
+            />
+            <div class="flex justify-between text-[11px] font-mono text-stone-400 mt-1">
+              <span>80m</span>
+              <span id="distance-km-sub" class="font-semibold text-stone-600">5.00 km</span>
+              <span>5000m</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick-Tap Track & Road Interval Presets -->
+        <div>
+          <div class="text-[10px] font-bold tracking-wider uppercase text-stone-400 mb-1.5">
+            Quick Intervals (m)
+          </div>
+          <div id="distance-presets" class="flex flex-wrap gap-1.5">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </article>
+
+      <!-- CARD 2: PACE (/KM) -->
+      <article
+        id="card-pace"
+        class="calc-card rounded-2xl p-4 sm:p-5 border transition-all duration-200 flex flex-col justify-between gap-4 bg-surface-card border-surface-border shadow-sm"
+      >
+        <div class="flex items-center justify-between">
+          <button
+            type="button"
+            data-mode="pace"
+            class="card-header-btn flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-stone-500 hover:text-brand-600 cursor-pointer"
+          >
+            <span>Pace / km</span>
+            <span id="dot-pace" class="w-2 h-2 rounded-full bg-brand-600 hidden"></span>
+          </button>
+          <span id="tag-pace" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-stone-200/80 text-stone-600">
+            INPUT
+          </span>
+        </div>
+
+        <!-- Pace MIN & SEC Selectors + Steppers -->
+        <div class="flex flex-col gap-3">
+          <!-- Pace Minutes -->
+          <div class="bg-surface-well border border-surface-border rounded-xl p-2.5 flex items-center justify-between gap-2">
+            <button
+              type="button"
+              id="pace-min-minus"
+              aria-label="Decrease pace minutes"
+              class="w-10 h-10 rounded-lg bg-white/80 hover:bg-white active:scale-95 border border-surface-border text-stone-700 font-bold text-lg flex items-center justify-center cursor-pointer"
+            >−</button>
+
+            <div class="flex-1 flex flex-col items-center">
+              <select
+                id="pace-min-select"
+                aria-label="Pace minutes per kilometer"
+                class="w-full text-center font-mono text-2xl sm:text-3xl font-bold bg-transparent text-stone-900 focus:outline-none cursor-pointer tabular-nums appearance-none"
+              ></select>
+              <span class="text-[10px] font-semibold tracking-widest uppercase text-stone-500">
+                MIN / KM
+              </span>
+            </div>
+
+            <button
+              type="button"
+              id="pace-min-plus"
+              aria-label="Increase pace minutes"
+              class="w-10 h-10 rounded-lg bg-white/80 hover:bg-white active:scale-95 border border-surface-border text-stone-700 font-bold text-lg flex items-center justify-center cursor-pointer"
+            >+</button>
+          </div>
+
+          <!-- Pace Seconds -->
+          <div class="bg-surface-well border border-surface-border rounded-xl p-2.5 flex items-center justify-between gap-2">
+            <button
+              type="button"
+              id="pace-sec-minus"
+              aria-label="Decrease pace seconds"
+              class="w-10 h-10 rounded-lg bg-white/80 hover:bg-white active:scale-95 border border-surface-border text-stone-700 font-bold text-lg flex items-center justify-center cursor-pointer"
+            >−</button>
+
+            <div class="flex-1 flex flex-col items-center">
+              <select
+                id="pace-sec-select"
+                aria-label="Pace seconds per kilometer"
+                class="w-full text-center font-mono text-2xl sm:text-3xl font-bold bg-transparent text-stone-900 focus:outline-none cursor-pointer tabular-nums appearance-none"
+              ></select>
+              <span class="text-[10px] font-semibold tracking-widest uppercase text-stone-500">
+                SEC / KM
+              </span>
+            </div>
+
+            <button
+              type="button"
+              id="pace-sec-plus"
+              aria-label="Increase pace seconds"
+              class="w-10 h-10 rounded-lg bg-white/80 hover:bg-white active:scale-95 border border-surface-border text-stone-700 font-bold text-lg flex items-center justify-center cursor-pointer"
+            >+</button>
+          </div>
+        </div>
+
+        <!-- Quick Pace Seconds & Common Paces -->
+        <div>
+          <div class="text-[10px] font-bold tracking-wider uppercase text-stone-400 mb-1.5">
+            Quick Pace Quarters
+          </div>
+          <div class="grid grid-cols-4 gap-1.5">
+            <button type="button" data-pace-sec="0" class="pace-sec-chip py-1.5 rounded-lg text-xs font-mono font-semibold bg-surface-well hover:bg-brand-100 text-stone-700 border border-surface-border cursor-pointer transition">:00</button>
+            <button type="button" data-pace-sec="15" class="pace-sec-chip py-1.5 rounded-lg text-xs font-mono font-semibold bg-surface-well hover:bg-brand-100 text-stone-700 border border-surface-border cursor-pointer transition">:15</button>
+            <button type="button" data-pace-sec="30" class="pace-sec-chip py-1.5 rounded-lg text-xs font-mono font-semibold bg-surface-well hover:bg-brand-100 text-stone-700 border border-surface-border cursor-pointer transition">:30</button>
+            <button type="button" data-pace-sec="45" class="pace-sec-chip py-1.5 rounded-lg text-xs font-mono font-semibold bg-surface-well hover:bg-brand-100 text-stone-700 border border-surface-border cursor-pointer transition">:45</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- CARD 3: DURATION -->
+      <article
+        id="card-duration"
+        class="calc-card rounded-2xl p-4 sm:p-5 border transition-all duration-200 flex flex-col justify-between gap-4 bg-surface-card border-surface-border shadow-sm"
+      >
+        <div class="flex items-center justify-between">
+          <button
+            type="button"
+            data-mode="duration"
+            class="card-header-btn flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-stone-500 hover:text-brand-600 cursor-pointer"
+          >
+            <span>Duration</span>
+            <span id="dot-duration" class="w-2 h-2 rounded-full bg-brand-600 hidden"></span>
+          </button>
+          <span id="tag-duration" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-brand-100 text-brand-700">
+            COMPUTED
+          </span>
+        </div>
+
+        <!-- Duration MIN & SEC Selectors + Steppers -->
+        <div class="flex flex-col gap-3">
+          <!-- Duration Minutes -->
+          <div class="bg-surface-well border border-surface-border rounded-xl p-2.5 flex items-center justify-between gap-2">
+            <button
+              type="button"
+              id="dur-min-minus"
+              aria-label="Decrease duration minutes"
+              class="w-10 h-10 rounded-lg bg-white/80 hover:bg-white active:scale-95 border border-surface-border text-stone-700 font-bold text-lg flex items-center justify-center cursor-pointer"
+            >−</button>
+
+            <div class="flex-1 flex flex-col items-center">
+              <select
+                id="dur-min-select"
+                aria-label="Duration minutes"
+                class="w-full text-center font-mono text-2xl sm:text-3xl font-bold bg-transparent text-stone-900 focus:outline-none cursor-pointer tabular-nums appearance-none"
+              ></select>
+              <span class="text-[10px] font-semibold tracking-widest uppercase text-stone-500">
+                MIN
+              </span>
+            </div>
+
+            <button
+              type="button"
+              id="dur-min-plus"
+              aria-label="Increase duration minutes"
+              class="w-10 h-10 rounded-lg bg-white/80 hover:bg-white active:scale-95 border border-surface-border text-stone-700 font-bold text-lg flex items-center justify-center cursor-pointer"
+            >+</button>
+          </div>
+
+          <!-- Duration Seconds -->
+          <div class="bg-surface-well border border-surface-border rounded-xl p-2.5 flex items-center justify-between gap-2">
+            <button
+              type="button"
+              id="dur-sec-minus"
+              aria-label="Decrease duration seconds"
+              class="w-10 h-10 rounded-lg bg-white/80 hover:bg-white active:scale-95 border border-surface-border text-stone-700 font-bold text-lg flex items-center justify-center cursor-pointer"
+            >−</button>
+
+            <div class="flex-1 flex flex-col items-center">
+              <select
+                id="dur-sec-select"
+                aria-label="Duration seconds"
+                class="w-full text-center font-mono text-2xl sm:text-3xl font-bold bg-transparent text-stone-900 focus:outline-none cursor-pointer tabular-nums appearance-none"
+              ></select>
+              <span class="text-[10px] font-semibold tracking-widest uppercase text-stone-500">
+                SEC
+              </span>
+            </div>
+
+            <button
+              type="button"
+              id="dur-sec-plus"
+              aria-label="Increase duration seconds"
+              class="w-10 h-10 rounded-lg bg-white/80 hover:bg-white active:scale-95 border border-surface-border text-stone-700 font-bold text-lg flex items-center justify-center cursor-pointer"
+            >+</button>
+          </div>
+        </div>
+
+        <!-- Quick Duration Presets -->
+        <div>
+          <div class="text-[10px] font-bold tracking-wider uppercase text-stone-400 mb-1.5">
+            Quick Duration (Min)
+          </div>
+          <div id="duration-presets" class="flex flex-wrap gap-1.5">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Live Bottom Summary Bar -->
+    <section
+      aria-label="Live workout summary"
+      class="bg-surface-card border border-surface-border rounded-2xl p-4 sm:px-6 shadow-sm grid grid-cols-2 sm:grid-cols-4 gap-4 text-center"
+    >
+      <div class="flex flex-col items-center justify-center">
+        <span class="text-[10px] font-bold tracking-widest uppercase text-stone-400">DIST</span>
+        <span id="summary-dist-km" class="font-mono text-lg sm:text-xl font-bold text-stone-900 tabular-nums mt-0.5">
+          5.00 km
+        </span>
+        <span id="summary-dist-m" class="font-mono text-[11px] text-stone-500 tabular-nums">
+          5000 m
+        </span>
+      </div>
+
+      <div class="flex flex-col items-center justify-center">
+        <span class="text-[10px] font-bold tracking-widest uppercase text-stone-400">PACE</span>
+        <span id="summary-pace" class="font-mono text-lg sm:text-xl font-bold text-stone-900 tabular-nums mt-0.5">
+          5:15
+        </span>
+        <span class="font-mono text-[11px] text-stone-500">
+          min / km
+        </span>
+      </div>
+
+      <div class="flex flex-col items-center justify-center">
+        <span class="text-[10px] font-bold tracking-widest uppercase text-stone-400">TIME</span>
+        <span id="summary-time" class="font-mono text-lg sm:text-xl font-bold text-brand-600 tabular-nums mt-0.5">
+          26:15
+        </span>
+        <span class="font-mono text-[11px] text-stone-500">
+          total duration
+        </span>
+      </div>
+
+      <div class="flex flex-col items-center justify-center border-t sm:border-t-0 sm:border-l border-surface-border pt-3 sm:pt-0 sm:pl-4 col-span-2 sm:col-span-1">
+        <span class="text-[10px] font-bold tracking-widest uppercase text-stone-400">400M LAP SPLIT</span>
+        <span id="summary-lap" class="font-mono text-lg sm:text-xl font-bold text-stone-900 tabular-nums mt-0.5">
+          2:06.0
+        </span>
+        <span id="summary-speed" class="font-mono text-[11px] text-stone-500 tabular-nums">
+          11.4 km/h
+        </span>
+      </div>
+    </section>
+
+    <!-- Range Clamp Notice Toast (Non-blocking inline status) -->
+    <div
+      id="status-banner"
+      class="hidden rounded-xl bg-brand-50 border border-brand-200 px-3.5 py-2 text-xs font-medium text-brand-700 text-center"
+    ></div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full max-w-5xl mx-auto px-4 py-4 text-center">
+    <p class="font-mono text-[11px] tracking-wider text-stone-400">
+      PACE LANE &bull; offline ready &bull; no data leaves this device
+    </p>
+  </footer>
+
+  <!-- Install as Android App Helper Modal -->
+  <div
+    id="install-modal"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-stone-950/60 backdrop-blur-xs p-4"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="install-modal-title"
+  >
+    <div class="bg-surface-card border border-surface-border rounded-3xl max-w-md w-full p-6 shadow-2xl flex flex-col gap-4">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-brand-600 flex items-center justify-center text-white shadow-md shrink-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <circle cx="12" cy="13" r="8" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4l2.5 2.5M9 2h6" />
+            </svg>
+          </div>
+          <div>
+            <h2 id="install-modal-title" class="text-base font-extrabold text-stone-900">
+              Install Pace Lane on Android
+            </h2>
+            <p class="text-xs text-stone-500">Runs full-screen & offline like a native app</p>
+          </div>
+        </div>
+        <button
+          id="close-modal-x"
+          type="button"
+          aria-label="Close install instructions"
+          class="w-8 h-8 rounded-full bg-surface-well hover:bg-stone-200 text-stone-600 flex items-center justify-center cursor-pointer"
+        >✕</button>
+      </div>
+
+      <!-- Native Prompt Trigger (shown automatically if browser supports beforeinstallprompt) -->
+      <button
+        id="native-install-trigger"
+        type="button"
+        class="hidden w-full py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm shadow-md transition cursor-pointer"
+      >
+        Install App Now
+      </button>
+
+      <ol class="space-y-3 text-xs sm:text-sm text-stone-700 bg-surface-well p-4 rounded-2xl border border-surface-border">
+        <li class="flex items-start gap-2.5">
+          <span class="w-5 h-5 rounded-full bg-brand-600 text-white font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+          <span>Host this <code class="font-mono bg-white px-1.5 py-0.5 rounded text-stone-800">index.html</code> on <strong>GitHub Pages</strong> and open the <code class="font-mono text-brand-700">https://</code> link in <strong>Google Chrome</strong> on Android.</span>
+        </li>
+        <li class="flex items-start gap-2.5">
+          <span class="w-5 h-5 rounded-full bg-brand-600 text-white font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+          <span>Tap the <strong>three dots (⋮)</strong> in the top-right corner of Chrome.</span>
+        </li>
+        <li class="flex items-start gap-2.5">
+          <span class="w-5 h-5 rounded-full bg-brand-600 text-white font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+          <span>Tap <strong>Add to Home screen</strong> → <strong>Install</strong>. The Pace Lane icon will appear in your Android app drawer.</span>
+        </li>
+      </ol>
+
+      <button
+        id="close-modal-btn"
+        type="button"
+        class="w-full py-2.5 px-4 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold tracking-wide uppercase cursor-pointer"
+      >
+        Got It
+      </button>
+    </div>
+  </div>
+
+  <!-- Application Logic & Offline Service Worker Registration -->
+  <script>
+    (function () {
+      'use strict';
+
+      // --- Constants & Preset Lists ---
+      const MIN_DIST = 80;
+      const MAX_DIST = 5000;
+      const DISTANCE_PRESETS = [80, 100, 150, 200, 300, 400, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000];
+      const DURATION_MIN_PRESETS = [1, 2, 3, 4, 5, 6, 9, 12, 15, 20, 24, 30];
+
+      // --- Application State ---
+      // mode = which field is COMPUTED ('duration' | 'pace' | 'distance')
+      const state = {
+        mode: 'duration',
+        distanceMeters: 5000, // 80m - 5000m
+        paceMin: 5,           // 2 - 20 min/km
+        paceSec: 15,          // 0 - 59 sec/km
+        durMin: 26,           // 0 - 120 min
+        durSec: 15            // 0 - 59 sec
+      };
+
+      // --- DOM References ---
+      const modePills = document.querySelectorAll('.mode-pill');
+      const cardHeaderBtns = document.querySelectorAll('.card-header-btn');
+      const cards = {
+        distance: document.getElementById('card-distance'),
+        pace: document.getElementById('card-pace'),
+        duration: document.getElementById('card-duration')
+      };
+      const dots = {
+        distance: document.getElementById('dot-distance'),
+        pace: document.getElementById('dot-pace'),
+        duration: document.getElementById('dot-duration')
+      };
+      const tags = {
+        distance: document.getElementById('tag-distance'),
+        pace: document.getElementById('tag-pace'),
+        duration: document.getElementById('tag-duration')
+      };
+
+      const distanceInput = document.getElementById('distance-input');
+      const distanceSlider = document.getElementById('distance-slider');
+      const distanceKmSub = document.getElementById('distance-km-sub');
+      const distancePresetsEl = document.getElementById('distance-presets');
+
+      const paceMinSelect = document.getElementById('pace-min-select');
+      const paceSecSelect = document.getElementById('pace-sec-select');
+      const paceSecChips = document.querySelectorAll('.pace-sec-chip');
+
+      const durMinSelect = document.getElementById('dur-min-select');
+      const durSecSelect = document.getElementById('dur-sec-select');
+      const durationPresetsEl = document.getElementById('duration-presets');
+
+      const summaryDistKm = document.getElementById('summary-dist-km');
+      const summaryDistM = document.getElementById('summary-dist-m');
+      const summaryPace = document.getElementById('summary-pace');
+      const summaryTime = document.getElementById('summary-time');
+      const summaryLap = document.getElementById('summary-lap');
+      const summarySpeed = document.getElementById('summary-speed');
+      const statusBanner = document.getElementById('status-banner');
+
+      // --- Populate Select Options & Preset Chips ---
+      function initControls() {
+        // Pace Minutes (2 to 20, highlighting common 3-7)
+        for (let m = 2; m <= 20; m++) {
+          const opt = document.createElement('option');
+          opt.value = m;
+          opt.textContent = m;
+          paceMinSelect.appendChild(opt);
+        }
+
+        // Pace Seconds (00 to 59 so computed paces display cleanly, quarters stand out)
+        for (let s = 0; s < 60; s++) {
+          const opt = document.createElement('option');
+          opt.value = s;
+          opt.textContent = String(s).padStart(2, '0');
+          paceSecSelect.appendChild(opt);
+        }
+
+        // Duration Minutes (0 to 120)
+        for (let m = 0; m <= 120; m++) {
+          const opt = document.createElement('option');
+          opt.value = m;
+          opt.textContent = m;
+          durMinSelect.appendChild(opt);
+        }
+
+        // Duration Seconds (00 to 59)
+        for (let s = 0; s < 60; s++) {
+          const opt = document.createElement('option');
+          opt.value = s;
+          opt.textContent = String(s).padStart(2, '0');
+          durSecSelect.appendChild(opt);
+        }
+
+        // Distance Preset Chips
+        DISTANCE_PRESETS.forEach((meters) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.dataset.dist = meters;
+          btn.textContent = meters;
+          btn.className = 'dist-preset-chip px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-surface-well hover:bg-brand-100 text-stone-700 border border-surface-border cursor-pointer transition';
+          btn.addEventListener('click', () => {
+            if (state.mode === 'distance') {
+              setMode('duration');
+            }
+            setDistance(meters);
+          });
+          distancePresetsEl.appendChild(btn);
+        });
+
+        // Duration Preset Chips
+        DURATION_MIN_PRESETS.forEach((mins) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.dataset.durMin = mins;
+          btn.textContent = `${mins}m`;
+          btn.className = 'dur-preset-chip px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-surface-well hover:bg-brand-100 text-stone-700 border border-surface-border cursor-pointer transition';
+          btn.addEventListener('click', () => {
+            if (state.mode === 'duration') {
+              setMode('pace');
+            }
+            state.durMin = mins;
+            state.durSec = 0;
+            recalculate();
+          });
+          durationPresetsEl.appendChild(btn);
+        });
+      }
+
+      // --- Formatting Helpers ---
+      function pad2(n) {
+        return String(Math.floor(Math.max(0, n))).padStart(2, '0');
+      }
+
+      function formatClock(totalSeconds) {
+        const rounded = Math.max(0, Math.round(totalSeconds));
+        const mins = Math.floor(rounded / 60);
+        const secs = rounded % 60;
+        return `${mins}:${pad2(secs)}`;
+      }
+
+      function formatLapSplit(secondsPer400m) {
+        if (!isFinite(secondsPer400m) || secondsPer400m <= 0) return '0:00.0';
+        const mins = Math.floor(secondsPer400m / 60);
+        const rem = (secondsPer400m % 60).toFixed(1);
+        const paddedRem = Number(rem) < 10 ? `0${rem}` : rem;
+        return `${mins}:${paddedRem}`;
+      }
+
+      function showNotice(msg) {
+        if (!msg) {
+          statusBanner.classList.add('hidden');
+          statusBanner.textContent = '';
+          return;
+        }
+        statusBanner.textContent = msg;
+        statusBanner.classList.remove('hidden');
+      }
+
+      // --- Core Math & State Sync ---
+      function recalculate() {
+        showNotice('');
+
+        const distKm = state.distanceMeters / 1000;
+        let totalPaceSec = state.paceMin * 60 + state.paceSec;
+        let totalDurSec = state.durMin * 60 + state.durSec;
+
+        if (state.mode === 'duration') {
+          // Compute Duration from Distance & Pace
+          totalDurSec = Math.round(distKm * totalPaceSec);
+          state.durMin = Math.min(120, Math.floor(totalDurSec / 60));
+          state.durSec = totalDurSec % 60;
+        } else if (state.mode === 'pace') {
+          // Compute Pace from Distance & Duration
+          if (totalDurSec <= 0) {
+            totalDurSec = 1;
+            state.durSec = 1;
+          }
+          totalPaceSec = Math.round(totalDurSec / distKm);
+          const clampedPaceSec = Math.max(120, Math.min(20 * 60 + 59, totalPaceSec));
+          if (clampedPaceSec !== totalPaceSec) {
+            showNotice(`Computed pace (${formatClock(totalPaceSec)}/km) adjusted to displayable range (2:00–20:59/km).`);
+          }
+          state.paceMin = Math.floor(clampedPaceSec / 60);
+          state.paceSec = clampedPaceSec % 60;
+          totalPaceSec = clampedPaceSec;
+        } else if (state.mode === 'distance') {
+          // Compute Distance from Pace & Duration
+          if (totalPaceSec <= 0) {
+            totalPaceSec = 300;
+            state.paceMin = 5;
+            state.paceSec = 0;
+          }
+          const rawMeters = Math.round((totalDurSec / totalPaceSec) * 1000);
+          const clampedMeters = Math.max(MIN_DIST, Math.min(MAX_DIST, rawMeters));
+          if (rawMeters < MIN_DIST || rawMeters > MAX_DIST) {
+            showNotice(`Computed distance (${rawMeters}m) clamped to supported 80m–5000m range.`);
+          }
+          state.distanceMeters = clampedMeters;
+        }
+
+        render();
+      }
+
+      function render() {
+        // 1. Update Mode Pills & Card Highlights
+        modePills.forEach((pill) => {
+          const isTarget = pill.dataset.mode === state.mode;
+          const badge = pill.querySelector('.computed-badge');
+          if (isTarget) {
+            pill.classList.add('bg-brand-600', 'text-white', 'shadow-sm');
+            pill.classList.remove('text-stone-600', 'hover:text-stone-900');
+            badge.classList.remove('hidden');
+          } else {
+            pill.classList.remove('bg-brand-600', 'text-white', 'shadow-sm');
+            pill.classList.add('text-stone-600', 'hover:text-stone-900');
+            badge.classList.add('hidden');
+          }
+        });
+
+        (['distance', 'pace', 'duration']).forEach((key) => {
+          const isComputed = state.mode === key;
+          const card = cards[key];
+          const dot = dots[key];
+          const tag = tags[key];
+
+          if (isComputed) {
+            card.classList.add('border-brand-500', 'bg-brand-50/40', 'ring-2', 'ring-brand-500/20');
+            card.classList.remove('border-surface-border', 'bg-surface-card');
+            dot.classList.remove('hidden');
+            tag.textContent = 'COMPUTED';
+            tag.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-brand-600 text-white tracking-wider';
+          } else {
+            card.classList.remove('border-brand-500', 'bg-brand-50/40', 'ring-2', 'ring-brand-500/20');
+            card.classList.add('border-surface-border', 'bg-surface-card');
+            dot.classList.add('hidden');
+            tag.textContent = 'INPUT';
+            tag.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-stone-200/80 text-stone-600 tracking-wider';
+          }
+        });
+
+        // 2. Sync Distance UI
+        if (document.activeElement !== distanceInput) {
+          distanceInput.value = state.distanceMeters;
+        }
+        distanceSlider.value = state.distanceMeters;
+        const kmFormatted = (state.distanceMeters / 1000).toFixed(2);
+        distanceKmSub.textContent = `${kmFormatted} km`;
+
+        document.querySelectorAll('.dist-preset-chip').forEach((chip) => {
+          const active = Number(chip.dataset.dist) === state.distanceMeters;
+          chip.className = active
+            ? 'dist-preset-chip px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-brand-600 text-white border border-brand-600 cursor-pointer transition'
+            : 'dist-preset-chip px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-surface-well hover:bg-brand-100 text-stone-700 border border-surface-border cursor-pointer transition';
+        });
+
+        // 3. Sync Pace UI
+        paceMinSelect.value = state.paceMin;
+        paceSecSelect.value = state.paceSec;
+
+        paceSecChips.forEach((chip) => {
+          const active = Number(chip.dataset.paceSec) === state.paceSec;
+          chip.className = active
+            ? 'pace-sec-chip py-1.5 rounded-lg text-xs font-mono font-bold bg-brand-600 text-white border border-brand-600 cursor-pointer transition'
+            : 'pace-sec-chip py-1.5 rounded-lg text-xs font-mono font-semibold bg-surface-well hover:bg-brand-100 text-stone-700 border border-surface-border cursor-pointer transition';
+        });
+
+        // 4. Sync Duration UI
+        durMinSelect.value = state.durMin;
+        durSecSelect.value = state.durSec;
+
+        document.querySelectorAll('.dur-preset-chip').forEach((chip) => {
+          const active = Number(chip.dataset.durMin) === state.durMin && state.durSec === 0;
+          chip.className = active
+            ? 'dur-preset-chip px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-brand-600 text-white border border-brand-600 cursor-pointer transition'
+            : 'dur-preset-chip px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-surface-well hover:bg-brand-100 text-stone-700 border border-surface-border cursor-pointer transition';
+        });
+
+        // 5. Sync Live Bottom Summary Bar
+        const totalPaceSec = state.paceMin * 60 + state.paceSec;
+        const totalDurSec = state.durMin * 60 + state.durSec;
+        const lap400Sec = totalPaceSec * 0.4;
+        const speedKmh = totalPaceSec > 0 ? (3600 / totalPaceSec).toFixed(1) : '0.0';
+
+        summaryDistKm.textContent = `${kmFormatted} km`;
+        summaryDistM.textContent = `${state.distanceMeters} m`;
+        summaryPace.textContent = `${state.paceMin}:${pad2(state.paceSec)}`;
+        summaryTime.textContent = formatClock(totalDurSec);
+        summaryLap.textContent = formatLapSplit(lap400Sec);
+        summarySpeed.textContent = `${speedKmh} km/h`;
+      }
+
+      // --- Mutators ---
+      function setMode(newMode) {
+        if (!['distance', 'pace', 'duration'].includes(newMode)) return;
+        state.mode = newMode;
+        recalculate();
+      }
+
+      function setDistance(meters, switchFromAuto = true) {
+        if (switchFromAuto && state.mode === 'distance') {
+          state.mode = 'duration';
+        }
+        const clamped = Math.max(MIN_DIST, Math.min(MAX_DIST, Math.round(meters)));
+        state.distanceMeters = clamped;
+        recalculate();
+      }
+
+      function adjustPace(deltaSeconds) {
+        if (state.mode === 'pace') {
+          state.mode = 'duration';
+        }
+        let total = state.paceMin * 60 + state.paceSec + deltaSeconds;
+        total = Math.max(120, Math.min(20 * 60 + 59, total));
+        state.paceMin = Math.floor(total / 60);
+        state.paceSec = total % 60;
+        recalculate();
+      }
+
+      function adjustDuration(deltaSeconds) {
+        if (state.mode === 'duration') {
+          state.mode = 'pace';
+        }
+        let total = state.durMin * 60 + state.durSec + deltaSeconds;
+        total = Math.max(1, Math.min(120 * 60 + 59, total));
+        state.durMin = Math.floor(total / 60);
+        state.durSec = total % 60;
+        recalculate();
+      }
+
+      // --- Event Listeners ---
+      modePills.forEach((pill) => {
+        pill.addEventListener('click', () => setMode(pill.dataset.mode));
+      });
+
+      cardHeaderBtns.forEach((btn) => {
+        btn.addEventListener('click', () => setMode(btn.dataset.mode));
+      });
+
+      // Distance inputs
+      distanceInput.addEventListener('input', () => {
+        const val = parseInt(distanceInput.value, 10);
+        if (!isNaN(val)) {
+          if (state.mode === 'distance') state.mode = 'duration';
+          if (val >= MIN_DIST && val <= MAX_DIST) {
+            state.distanceMeters = val;
+            recalculate();
+          }
+        }
+      });
+
+      distanceInput.addEventListener('blur', () => {
+        const val = parseInt(distanceInput.value, 10);
+        setDistance(isNaN(val) ? MIN_DIST : val, false);
+        distanceInput.value = state.distanceMeters;
+      });
+
+      distanceSlider.addEventListener('input', () => {
+        setDistance(parseInt(distanceSlider.value, 10));
+      });
+
+      document.getElementById('dist-minus').addEventListener('click', () => {
+        setDistance(state.distanceMeters - 10);
+      });
+
+      document.getElementById('dist-plus').addEventListener('click', () => {
+        setDistance(state.distanceMeters + 10);
+      });
+
+      // Pace inputs
+      paceMinSelect.addEventListener('change', () => {
+        if (state.mode === 'pace') state.mode = 'duration';
+        state.paceMin = parseInt(paceMinSelect.value, 10);
+        recalculate();
+      });
+
+      paceSecSelect.addEventListener('change', () => {
+        if (state.mode === 'pace') state.mode = 'duration';
+        state.paceSec = parseInt(paceSecSelect.value, 10);
+        recalculate();
+      });
+
+      document.getElementById('pace-min-minus').addEventListener('click', () => adjustPace(-60));
+      document.getElementById('pace-min-plus').addEventListener('click', () => adjustPace(60));
+      document.getElementById('pace-sec-minus').addEventListener('click', () => adjustPace(-5));
+      document.getElementById('pace-sec-plus').addEventListener('click', () => adjustPace(5));
+
+      paceSecChips.forEach((chip) => {
+        chip.addEventListener('click', () => {
+          if (state.mode === 'pace') state.mode = 'duration';
+          state.paceSec = parseInt(chip.dataset.paceSec, 10);
+          recalculate();
+        });
+      });
+
+      // Duration inputs
+      durMinSelect.addEventListener('change', () => {
+        if (state.mode === 'duration') state.mode = 'pace';
+        state.durMin = parseInt(durMinSelect.value, 10);
+        recalculate();
+      });
+
+      durSecSelect.addEventListener('change', () => {
+        if (state.mode === 'duration') state.mode = 'pace';
+        state.durSec = parseInt(durSecSelect.value, 10);
+        recalculate();
+      });
+
+      document.getElementById('dur-min-minus').addEventListener('click', () => adjustDuration(-60));
+      document.getElementById('dur-min-plus').addEventListener('click', () => adjustDuration(60));
+      document.getElementById('dur-sec-minus').addEventListener('click', () => adjustDuration(-15));
+      document.getElementById('dur-sec-plus').addEventListener('click', () => adjustDuration(15));
+
+      // --- Install Modal & Native PWA Install Prompt ---
+      const installBtn = document.getElementById('install-btn');
+      const installModal = document.getElementById('install-modal');
+      const closeModalX = document.getElementById('close-modal-x');
+      const closeModalBtn = document.getElementById('close-modal-btn');
+      const nativeInstallTrigger = document.getElementById('native-install-trigger');
+      let deferredPrompt = null;
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        nativeInstallTrigger.classList.remove('hidden');
+      });
+
+      nativeInstallTrigger.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        nativeInstallTrigger.classList.add('hidden');
+        installModal.classList.add('hidden');
+        installModal.classList.remove('flex');
+      });
+
+      function openInstallModal() {
+        installModal.classList.remove('hidden');
+        installModal.classList.add('flex');
+      }
+
+      function closeInstallModal() {
+        installModal.classList.add('hidden');
+        installModal.classList.remove('flex');
+      }
+
+      installBtn.addEventListener('click', openInstallModal);
+      closeModalX.addEventListener('click', closeInstallModal);
+      closeModalBtn.addEventListener('click', closeInstallModal);
+      installModal.addEventListener('click', (e) => {
+        if (e.target === installModal) closeInstallModal();
+      });
+
+      // --- Inline Blob Service Worker for Offline Caching on GitHub Pages ---
+      if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+        const swCode = `
+          const CACHE_NAME = 'pace-lane-v1';
+          self.addEventListener('install', (event) => {
+            event.waitUntil(
+              caches.open(CACHE_NAME).then((cache) => cache.addAll(['./']))
+            );
+            self.skipWaiting();
+          });
+          self.addEventListener('activate', (event) => {
+            event.waitUntil(self.clients.claim());
+          });
+          self.addEventListener('fetch', (event) => {
+            event.respondWith(
+              caches.match(event.request).then((cached) => {
+                return cached || fetch(event.request).then((response) => {
+                  const copy = response.clone();
+                  caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+                  return response;
+                }).catch(() => cached);
+              })
+            );
+          });
+        `;
+        try {
+          const blob = new Blob([swCode], { type: 'application/javascript' });
+          const swUrl = URL.createObjectURL(blob);
+          navigator.serviceWorker.register(swUrl).catch(() => {});
+        } catch (err) {
+          // Graceful fallback if restricted by browser sandbox
+        }
+      }
+
+      // --- Boot ---
+      initControls();
+      recalculate();
+    })();
+  </script>
+</body>
+</html>
